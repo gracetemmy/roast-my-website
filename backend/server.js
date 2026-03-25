@@ -196,7 +196,14 @@ app.post('/api/analyze-website', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🔥 Roast My Website API running on http://localhost:${PORT}`);
-  console.log(`📡 ElevenAgent tool endpoint: POST /api/roast-website`);
-});
+
+// Only listen if not in Vercel serverless environment
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`🔥 Roast My Website API running on http://localhost:${PORT}`);
+    console.log(`📡 ElevenAgent tool endpoint: POST /api/roast-website`);
+  });
+}
+
+// Export for Vercel serverless
+export default app;
