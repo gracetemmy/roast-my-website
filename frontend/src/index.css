@@ -1,0 +1,143 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff6b35, #f7c531);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  color: #888;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.roast-button {
+  padding: 1.2rem 3rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.roast-button.idle {
+  background: linear-gradient(90deg, #ff6b35, #f7c531);
+  color: #0f0f0f;
+}
+
+.roast-button.idle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+}
+
+.roast-button.active {
+  background: linear-gradient(90deg, #e63946, #ff006e);
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(230, 57, 70, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(230, 57, 70, 0.8); }
+}
+
+.status {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.status.connected {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid #00ff88;
+  color: #00ff88;
+}
+
+.status.connecting {
+  background: rgba(247, 197, 49, 0.1);
+  border: 1px solid #f7c531;
+  color: #f7c531;
+}
+
+.status.error {
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid #e63946;
+  color: #e63946;
+}
+
+.instructions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  max-width: 500px;
+}
+
+.instructions h3 {
+  color: #f7c531;
+  margin-bottom: 1rem;
+}
+
+.instructions ol {
+  text-align: left;
+  color: #aaa;
+  line-height: 1.8;
+}
+
+.instructions code {
+  background: rgba(255, 107, 53, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: #ff6b35;
+}
+
+.powered-by {
+  margin-top: 3rem;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.powered-by a {
+  color: #ff6b35;
+  text-decoration: none;
+}
+
+.powered-by a:hover {
+  text-decoration: underline;
+}

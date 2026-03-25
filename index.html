@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roast My Website 🔥 | AI Website Critic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #0a0a0f;
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Animated fire background */
+    .fire-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at bottom, #1a0a00 0%, transparent 60%),
+                  radial-gradient(ellipse at top, #0a0a0f 0%, #0a0a0f 100%);
+      z-index: -2;
+    }
+
+    .ember {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: #ff6b35;
+      border-radius: 50%;
+      animation: float-up 4s ease-in infinite;
+      opacity: 0;
+      z-index: -1;
+    }
+
+    @keyframes float-up {
+      0% { transform: translateY(100vh) scale(1); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) scale(0); opacity: 0; }
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      padding: 0.6rem 1.2rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,107,53,0.2);
+      border-color: #ff6b35;
+      color: #ff6b35;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .fire-icon {
+      font-size: 4rem;
+      animation: burn 1s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+
+    @keyframes burn {
+      0% { transform: scale(1) rotate(-2deg); }
+      100% { transform: scale(1.1) rotate(2deg); }
+    }
+
+    h1 {
+      font-size: 3rem;
+      background: linear-gradient(135deg, #ff6b35, #f7c531);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline { color: #888; font-size: 1.1rem; margin-top: 0.5rem; }
+
+    /* Tabs content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Main Card */
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    /* Severity Slider */
+    .severity-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .severity-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .severity-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #4ade80, #facc15, #ef4444);
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .severity-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #ff6b35;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .severity-display {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Voice Persona */
+    .persona-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .persona-card {
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .persona-card:hover {
+      border-color: rgba(255,107,53,0.5);
+      background: rgba(255,107,53,0.05);
+    }
+
+    .persona-card.selected {
+      border-color: #ff6b35;
+      background: rgba(255,107,53,0.1);
+    }
+
+    .persona-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .persona-name { font-weight: 600; font-size: 0.9rem; }
+    .persona-desc { font-size: 0.75rem; color: #888; margin-top: 0.25rem; }
+
+    /* URL Input */
+    .input-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .url-input {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .url-input:focus {
+      outline: none;
+      border-color: #ff6b35;
+    }
+
+    .url-input::placeholder { color: #555; }
+
+    .btn {
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6b35, #f7c531);
+      color: #0a0a0f;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255,107,53,0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Example chips */
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .chip {
+      padding: 0.4rem 0.8rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: rgba(255,107,53,0.1);
+      border-color: rgba(255,107,53,0.3);
+      color: #ff6b35;
+    }
+
+    /* Response Area */
+    .response-area {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .response-area.active { display: block; }
+
+    /* Screenshot Preview */
+    .screenshot-preview {
+      width: 100%;
+      height: 200px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .screenshot-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .screenshot-placeholder {
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    /* Category Scores */
+    .category-scores {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .score-item {
+      text-align: center;
+      padding: 1rem 0.5rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+    }
+
+    .score-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .score-label { font-size: 0.7rem; color: #888; margin-bottom: 0.25rem; }
+    .score-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .score-good { color: #4ade80; }
+    .score-medium { color: #facc15; }
+    .score-bad { color: #ef4444; }
+
+    /* Roast Text */
+    .roast-text {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .roast-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .roast-header-icon { font-size: 1.5rem; }
+    .roast-header-title { font-weight: 600; color: #ff6b35; }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .action-btn {
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #ccc;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(255,107,53,0.1);
+      border-color: rgba(255,107,53,0.3);
+      color: #ff6b35;
+    }
+
+    /* Battle Mode */
+    .battle-container {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .battle-side {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .battle-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ff6b35;
+      padding: 2rem 1rem;
+    }
+
+    .battle-score-big {
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .winner-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .loser-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(239,68,68,0.2);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #ef4444;
+    }
+
+    /* Leaderboard */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+    }
+
+    .leaderboard-rank {
+      font-size: 1.5rem;
+      font-weight: 700;
+      width: 40px;
+      text-align: center;
+    }
+
+    .leaderboard-rank.gold { color: #f7c531; }
+    .leaderboard-rank.silver { color: #c0c0c0; }
+    .leaderboard-rank.bronze { color: #cd7f32; }
+
+    .leaderboard-site {
+      flex: 1;
+    }
+
+    .leaderboard-site-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .leaderboard-site-score {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .leaderboard-roasts {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #ff6b35;
+    }
+
+    /* Shareable Card */
+    .share-card {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      border: 2px solid #ff6b35;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .share-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #ff6b35;
+    }
+
+    .share-card-score {
+      font-size: 4rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+
+    .share-card-roast {
+      font-size: 0.95rem;
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .share-card-footer {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* Loading */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-left-color: #0a0a0f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #444;
+      font-size: 0.85rem;
+    }
+
+    .footer a { color: #ff6b35; text-decoration: none; }
+
+    .tech-stack {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .tech-badge {
+      padding: 0.25rem 0.6rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    /* Widget */
+    elevenlabs-convai {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: #1a1a2e;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 550px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .battle-container { grid-template-columns: 1fr; }
+      .battle-vs { padding: 1rem; }
+      .category-scores { grid-template-columns: repeat(3, 1fr); }
+      .input-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="fire-bg"></div>
+
+  <!-- Embers -->
+  <script>
+    for(let i = 0; i < 20; i++) {
+      const ember = document.createElement('div');
+      ember.className = 'ember';
+      ember.style.left = Math.random() * 100 + '%';
+      ember.style.animationDelay = Math.random() * 4 + 's';
+      ember.style.animationDuration = (3 + Math.random() * 2) + 's';
+      document.body.appendChild(ember);
+    }
+  </script>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showTab('roast')">🔥 Single Roast</button>
+    <button class="nav-btn" onclick="showTab('battle')">⚔️ Roast Battle</button>
+    <button class="nav-btn" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+  </nav>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="fire-icon">🔥</div>
+      <h1>Roast My Website</h1>
+      <p class="tagline">AI-powered brutally honest website feedback</p>
+    </header>
+
+    <!-- Single Roast Tab -->
+    <div id="tab-roast" class="tab-content active">
+      <div class="card">
+        <h2>🎚️ Roast Severity</h2>
+        <div class="severity-section">
+          <div class="severity-label">
+            <span>😊 Mild</span>
+            <span>😈 Medium</span>
+            <span>💀 Savage</span>
+          </div>
+          <input type="range" class="severity-slider" id="severitySlider" min="1" max="3" value="2">
+          <div class="severity-display" id="severityDisplay">😈 Medium - Honest but fair</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎭 Voice Persona</h2>
+        <div class="persona-grid">
+          <div class="persona-card selected" data-persona="gordon">
+            <div class="persona-icon">👨‍🍳</div>
+            <div class="persona-name">Gordon Ramsay</div>
+            <div class="persona-desc">Kitchen nightmare energy</div>
+          </div>
+          <div class="persona-card" data-persona="simon">
+            <div class="persona-icon">🎤</div>
+            <div class="persona-name">Simon Cowell</div>
+            <div class="persona-desc">Talent show judge vibes</div>
+          </div>
+          <div class="persona-card" data-persona="mom">
+            <div class="persona-icon">👩</div>
+            <div class="persona-name">Supportive Mom</div>
+            <div class="persona-desc">Gentle encouragement</div>
+          </div>
+          <div class="persona-card" data-persona="drill">
+            <div class="persona-icon">🎖️</div>
+            <div class="persona-name">Drill Sergeant</div>
+            <div class="persona-desc">No excuses allowed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Enter Website URL</h2>
+        <div class="input-group">
+          <input type="text" class="url-input" id="urlInput" placeholder="Enter website URL (e.g., example.com)">
+          <button class="btn btn-primary" id="roastBtn" onclick="roastWebsite()">Roast It 🔥</button>
+        </div>
+        <div class="examples">
+          <span class="chip" onclick="setUrl('apple.com')">apple.com</span>
+          <span class="chip" onclick="setUrl('amazon.com')">amazon.com</span>
+          <span class="chip" onclick="setUrl('craigslist.org')">craigslist.org</span>
+          <span class="chip" onclick="setUrl('reddit.com')">reddit.com</span>
+        </div>
+      </div>
+
+      <!-- Response Area -->
+      <div class="response-area" id="responseArea">
+        <div class="card">
+          <!-- Screenshot Preview -->
+          <div class="screenshot-preview" id="screenshotPreview">
+            <span class="screenshot-placeholder">Website preview will appear here</span>
+          </div>
+
+          <!-- Category Scores -->
+          <div class="category-scores" id="categoryScores">
+            <div class="score-item">
+              <div class="score-icon">🎨</div>
+              <div class="score-label">DESIGN</div>
+              <div class="score-value" id="scoreDesign">--</div>
+            </div>
+            <div class="score-item">
+              <div class="score-icon">📝</div>
+              <div class="score-label">CONTENT</div>
+              <div class="score-value" id="scoreContent">--</div>
+            </div>
+            <div class="score-item">
+              <div class="score-icon">🖱️</div>
+              <div class="score-label">UX</div>
+              <div class="score-value" id="scoreUx">--</div>
+            </div>
+            <div class="score-item">
+              <div class="score-icon">🔍</div>
+              <div class="score-label">SEO</div>
+              <div class="score-value" id="scoreSeo">--</div>
+            </div>
+            <div class="score-item">
+              <div class="score-icon">⚡</div>
+              <div class="score-label">SPEED</div>
+              <div class="score-value" id="scoreSpeed">--</div>
+            </div>
+          </div>
+
+          <!-- Roast Text -->
+          <div class="roast-text">
+            <div class="roast-header">
+              <span class="roast-header-icon">🎭</span>
+              <span class="roast-header-title" id="roastPersonaTitle">The Roast Master says:</span>
+            </div>
+            <p id="roastText">Loading roast...</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn" onclick="speakRoast()">🔊 Play Roast</button>
+            <button class="action-btn" onclick="stopSpeaking()">⏹️ Stop</button>
+            <button class="action-btn" onclick="openShareModal()">📤 Share Card</button>
+            <button class="action-btn" onclick="copyRoast()">📋 Copy</button>
+            <button class="action-btn" onclick="roastAgain()">🔄 Roast Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battle Tab -->
+    <div id="tab-battle" class="tab-content">
+      <div class="card">
+        <h2>⚔️ Roast Battle Mode</h2>
+        <p style="color: #888; margin-bottom: 1.5rem;">Enter two websites to see which one survives the roast!</p>
+
+        <div class="battle-container">
+          <div class="battle-side">
+            <input type="text" class="url-input" id="battleUrl1" placeholder="Website 1 (e.g., apple.com)" style="width: 100%; margin-bottom: 1rem;">
+            <div id="battle1Result"></div>
+          </div>
+
+          <div class="battle-vs">VS</div>
+
+          <div class="battle-side">
+            <input type="text" class="url-input" id="battleUrl2" placeholder="Website 2 (e.g., samsung.com)" style="width: 100%; margin-bottom: 1rem;">
+            <div id="battle2Result"></div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button class="btn btn-primary" id="battleBtn" onclick="startBattle()">⚔️ Start Battle!</button>
+        </div>
+
+        <div id="battleWinner" style="text-align: center; margin-top: 2rem;"></div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Tab -->
+    <div id="tab-leaderboard" class="tab-content">
+      <div class="card">
+        <h2>🏆 Most Roasted Websites</h2>
+        <p style="color: #888; margin-bottom: 1.5rem;">The hall of shame (and fame)</p>
+
+        <div id="leaderboardList">
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank gold">1</div>
+            <div class="leaderboard-site">
+              <div class="leaderboard-site-name">craigslist.org</div>
+              <div class="leaderboard-site-score">Avg Score: 2.1/10</div>
+            </div>
+            <div class="leaderboard-roasts">🔥 247 roasts</div>
+          </div>
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank silver">2</div>
+            <div class="leaderboard-site">
+              <div class="leaderboard-site-name">amazon.com</div>
+              <div class="leaderboard-site-score">Avg Score: 5.4/10</div>
+            </div>
+            <div class="leaderboard-roasts">🔥 189 roasts</div>
+          </div>
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank bronze">3</div>
+            <div class="leaderboard-site">
+              <div class="leaderboard-site-name">reddit.com</div>
+              <div class="leaderboard-site-score">Avg Score: 6.2/10</div>
+            </div>
+            <div class="leaderboard-roasts">🔥 156 roasts</div>
+          </div>
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">4</div>
+            <div class="leaderboard-site">
+              <div class="leaderboard-site-name">apple.com</div>
+              <div class="leaderboard-site-score">Avg Score: 8.1/10</div>
+            </div>
+            <div class="leaderboard-roasts">🔥 134 roasts</div>
+          </div>
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">5</div>
+            <div class="leaderboard-site">
+              <div class="leaderboard-site-name">twitter.com</div>
+              <div class="leaderboard-site-score">Avg Score: 4.8/10</div>
+            </div>
+            <div class="leaderboard-roasts">🔥 98 roasts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Built for <a href="#">#ElevenHacks</a> Hackathon</p>
+      <div class="tech-stack">
+        <span class="tech-badge">ElevenLabs</span>
+        <span class="tech-badge">Firecrawl</span>
+        <span class="tech-badge">Voice AI</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Share Modal -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeShareModal()">&times;</button>
+      <div class="share-card" id="shareCard">
+        <h3>🔥 ROAST REPORT 🔥</h3>
+        <div id="shareCardSite" style="font-size: 1.2rem; margin-bottom: 0.5rem;">example.com</div>
+        <div class="share-card-score" id="shareCardScore">6.5</div>
+        <div style="font-size: 0.9rem; color: #888; margin-bottom: 1rem;">/10</div>
+        <div class="share-card-roast" id="shareCardRoast">
+          "This website has potential, but it needs work..."
+        </div>
+        <div class="share-card-footer">
+          roastmywebsite.com | #ElevenHacks
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-primary" onclick="downloadCard()">📥 Download</button>
+        <button class="btn btn-secondary" onclick="shareToTwitter()">🐦 Tweet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ElevenLabs Widget -->
+  <elevenlabs-convai agent-id="agent_6701kmht0y2hf8aa6ryc3achn2tz"></elevenlabs-convai>
+  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>
+
+  <script>
+    // Configuration
+    const API_URL = 'http://localhost:3001';
+    let currentRoast = '';
+    let currentScores = {};
+    let currentUrl = '';
+    let selectedPersona = 'gordon';
+    let severityLevel = 2;
+
+    // Tab Navigation
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Severity Slider
+    const severitySlider = document.getElementById('severitySlider');
+    const severityDisplay = document.getElementById('severityDisplay');
+    const severityOptions = [
+      { emoji: '😊', label: 'Mild', desc: 'Gentle and encouraging' },
+      { emoji: '😈', label: 'Medium', desc: 'Honest but fair' },
+      { emoji: '💀', label: 'Savage', desc: 'No mercy, maximum roast' }
+    ];
+
+    severitySlider.addEventListener('input', () => {
+      severityLevel = parseInt(severitySlider.value);
+      const opt = severityOptions[severityLevel - 1];
+      severityDisplay.textContent = `${opt.emoji} ${opt.label} - ${opt.desc}`;
+    });
+
+    // Persona Selection
+    document.querySelectorAll('.persona-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedPersona = card.dataset.persona;
+      });
+    });
+
+    // Set URL
+    function setUrl(url) {
+      document.getElementById('urlInput').value = url;
+    }
+
+    // Text-to-Speech
+    function speakText(text, persona) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Adjust voice based on persona
+        const voices = window.speechSynthesis.getVoices();
+        switch(persona) {
+          case 'gordon':
+            utterance.rate = 1.1;
+            utterance.pitch = 0.9;
+            break;
+          case 'simon':
+            utterance.rate = 0.9;
+            utterance.pitch = 0.8;
+            break;
+          case 'mom':
+            utterance.rate = 0.95;
+            utterance.pitch = 1.1;
+            break;
+          case 'drill':
+            utterance.rate = 1.2;
+            utterance.pitch = 0.7;
+            break;
+        }
+
+        const preferredVoice = voices.find(v => v.lang.startsWith('en'));
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function speakRoast() { speakText(currentRoast, selectedPersona); }
+    function stopSpeaking() { window.speechSynthesis.cancel(); }
+
+    // Generate scores from content analysis
+    function generateScores(data) {
+      const content = data.content || '';
+      const hasImages = content.includes('![') || content.includes('<img');
+      const hasLinks = content.includes('[') && content.includes('](');
+      const contentLength = content.length;
+      const hasDescription = !!data.description;
+
+      return {
+        design: Math.min(10, Math.max(1, Math.round(4 + Math.random() * 4 + (hasImages ? 1 : 0)))),
+        content: Math.min(10, Math.max(1, Math.round(3 + (contentLength > 1000 ? 3 : 1) + Math.random() * 3))),
+        ux: Math.min(10, Math.max(1, Math.round(4 + Math.random() * 4 + (hasLinks ? 1 : 0)))),
+        seo: Math.min(10, Math.max(1, Math.round(3 + (hasDescription ? 3 : 0) + Math.random() * 3))),
+        speed: Math.min(10, Math.max(1, Math.round(5 + Math.random() * 4)))
+      };
+    }
+
+    // Generate AI-style roast based on persona and severity
+    function generateRoast(data, persona, severity) {
+      const title = data.title || 'this website';
+      const scores = currentScores;
+      const avgScore = Object.values(scores).reduce((a, b) => a + b, 0) / 5;
+
+      const personaStyles = {
+        gordon: {
+          intro: [`Right, let's talk about ${title}.`, `Bloody hell, ${title}...`, `Oh for f***'s sake, ${title}!`],
+          roasts: {
+            mild: `It's... edible. The design is basic but functional. You've got potential here, really. The content is there, the structure makes sense. Just needs a bit more seasoning, you know? Keep at it.`,
+            medium: `This website is RAW! The design looks like someone threw ingredients at a wall. Your content is undercooked, your UX is all over the place. But you know what? There's a foundation here. Fix the basics and you might have something.`,
+            savage: `This is DISGUSTING! What is THIS?! The design is an absolute MESS. It looks like a donkey designed it blindfolded! The user experience? What user experience?! My nan could code better than this! Get out of my kitchen and come back when you've learned the basics!`
+          },
+          compliment: `But I'll say this - at least you're trying. That's more than most.`
+        },
+        simon: {
+          intro: [`So this is ${title}...`, `Let me be honest about ${title}.`, `${title}. Interesting.`],
+          roasts: {
+            mild: `It's... not terrible. I've seen worse. The design is forgettable but inoffensive. Your content does the job. It's like elevator music - it exists. With some polish, you could have something decent here.`,
+            medium: `I'm going to be honest with you. This is mediocre. It's the kind of website that auditions and you can't remember five minutes later. The design lacks originality, the content is derivative. You need to find what makes you unique.`,
+            savage: `This is absolutely dreadful. I've seen thousands of websites and this is comfortably in the bottom 10%. The design is dated, the content is boring, and frankly, I'm not sure why anyone would visit voluntarily. It's a no from me.`
+          },
+          compliment: `However, everyone starts somewhere. Come back when you've improved.`
+        },
+        mom: {
+          intro: [`Oh sweetie, let me look at ${title}!`, `Honey, I checked out ${title}...`, `${title}! My baby made this?`],
+          roasts: {
+            mild: `This is wonderful, honey! I'm so proud of you for making a website! The colors are nice, and I can read everything. Maybe add a few more pictures? But really, it's great!`,
+            medium: `Oh sweetie, this is... interesting! I can tell you worked hard on this. The design is creative in its own way. Maybe we could make it a tiny bit easier to read? But I'm putting this on the fridge!`,
+            savage: `Honey... I love you, but we need to talk. This website is... unique. Very unique. Maybe we should look at some tutorials together? I'll make cookies and we can figure this out. But I'm still proud you tried!`
+          },
+          compliment: `No matter what, mommy loves you and your website.`
+        },
+        drill: {
+          intro: [`ATTENTION! ${title} is under inspection!`, `DROP AND GIVE ME TWENTY! Then look at ${title}!`, `WHAT IN THE NAME OF ALL THAT'S HOLY IS ${title}?!`],
+          roasts: {
+            mild: `This website is... ACCEPTABLE, soldier! Basic formation, clean lines. You've followed orders. Could use more discipline in the execution, but you're on the right track! DISMISSED!`,
+            medium: `LISTEN UP, MAGGOT! This website is SLOPPY! I've seen better organization in a tornado! Your design lacks DISCIPLINE! Your content is SCATTERED! You will FIX this and report back! DO I MAKE MYSELF CLEAR?!`,
+            savage: `WHAT IN THE FRESH HELL IS THIS DISASTER?! This website is a DISGRACE to the internet! My GRANDMOTHER could make a better site, and she thinks the mouse is a foot pedal! DROP AND GIVE ME FIFTY LINES OF CLEAN CODE! THIS IS UNACCEPTABLE!`
+          },
+          compliment: `But you showed up, soldier. That takes guts. Now DO BETTER!`
+        }
+      };
+
+      const style = personaStyles[persona];
+      const severityKey = severity === 1 ? 'mild' : severity === 2 ? 'medium' : 'savage';
+      const intro = style.intro[Math.floor(Math.random() * style.intro.length)];
+
+      return `${intro} ${style.roasts[severityKey]} ${style.compliment}`;
+    }
+
+    // Update score display
+    function updateScoreDisplay(scores) {
+      const getScoreClass = (score) => score >= 7 ? 'score-good' : score >= 4 ? 'score-medium' : 'score-bad';
+
+      document.getElementById('scoreDesign').textContent = scores.design;
+      document.getElementById('scoreDesign').className = 'score-value ' + getScoreClass(scores.design);
+
+      document.getElementById('scoreContent').textContent = scores.content;
+      document.getElementById('scoreContent').className = 'score-value ' + getScoreClass(scores.content);
+
+      document.getElementById('scoreUx').textContent = scores.ux;
+      document.getElementById('scoreUx').className = 'score-value ' + getScoreClass(scores.ux);
+
+      document.getElementById('scoreSeo').textContent = scores.seo;
+      document.getElementById('scoreSeo').className = 'score-value ' + getScoreClass(scores.seo);
+
+      document.getElementById('scoreSpeed').textContent = scores.speed;
+      document.getElementById('scoreSpeed').className = 'score-value ' + getScoreClass(scores.speed);
+    }
+
+    // Main roast function
+    async function roastWebsite() {
+      const urlInput = document.getElementById('urlInput');
+      const btn = document.getElementById('roastBtn');
+      const responseArea = document.getElementById('responseArea');
+
+      const url = urlInput.value.trim();
+      if (!url) {
+        alert('Please enter a website URL');
+        return;
+      }
+
+      currentUrl = url;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span>';
+      responseArea.classList.add('active');
+      document.getElementById('roastText').textContent = '🔥 Analyzing website... preparing roast...';
+
+      // Reset scores
+      ['Design', 'Content', 'Ux', 'Seo', 'Speed'].forEach(cat => {
+        document.getElementById('score' + cat).textContent = '--';
+      });
+
+      try {
+        const response = await fetch(`${API_URL}/api/roast-website`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, severity: severityLevel, persona: selectedPersona })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Generate scores
+          currentScores = generateScores(data.data);
+          updateScoreDisplay(currentScores);
+
+          // Generate roast
+          currentRoast = generateRoast(data.data, selectedPersona, severityLevel);
+          document.getElementById('roastText').textContent = currentRoast;
+
+          // Update persona title
+          const personaTitles = {
+            gordon: '👨‍🍳 Chef Ramsay says:',
+            simon: '🎤 Simon says:',
+            mom: '👩 Mom says:',
+            drill: '🎖️ Sergeant says:'
+          };
+          document.getElementById('roastPersonaTitle').textContent = personaTitles[selectedPersona];
+
+          // Update screenshot preview
+          document.getElementById('screenshotPreview').innerHTML = `
+            <img src="https://image.thum.io/get/width/600/${url.startsWith('http') ? url : 'https://' + url}"
+                 onerror="this.parentElement.innerHTML='<span class=\\'screenshot-placeholder\\'>Preview unavailable</span>'"
+                 alt="Website preview">
+          `;
+
+          // Auto-play roast
+          setTimeout(() => speakRoast(), 500);
+
+        } else {
+          currentRoast = "Couldn't analyze that website. Either it's blocking us, or it's so bad it doesn't even exist!";
+          document.getElementById('roastText').textContent = currentRoast;
+        }
+      } catch (error) {
+        currentRoast = `Error: ${error.message}. The website might be too ashamed to show itself!`;
+        document.getElementById('roastText').textContent = currentRoast;
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = 'Roast It 🔥';
+    }
+
+    // Battle Mode
+    async function startBattle() {
+      const url1 = document.getElementById('battleUrl1').value.trim();
+      const url2 = document.getElementById('battleUrl2').value.trim();
+      const btn = document.getElementById('battleBtn');
+
+      if (!url1 || !url2) {
+        alert('Please enter both website URLs');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span>';
+      document.getElementById('battle1Result').innerHTML = '<p style="color: #888;">Analyzing...</p>';
+      document.getElementById('battle2Result').innerHTML = '<p style="color: #888;">Analyzing...</p>';
+      document.getElementById('battleWinner').innerHTML = '';
+
+      try {
+        const [res1, res2] = await Promise.all([
+          fetch(`${API_URL}/api/roast-website`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url1 })
+          }).then(r => r.json()),
+          fetch(`${API_URL}/api/roast-website`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url2 })
+          }).then(r => r.json())
+        ]);
+
+        const scores1 = res1.success ? generateScores(res1.data) : { design: 1, content: 1, ux: 1, seo: 1, speed: 1 };
+        const scores2 = res2.success ? generateScores(res2.data) : { design: 1, content: 1, ux: 1, seo: 1, speed: 1 };
+
+        const avg1 = Object.values(scores1).reduce((a, b) => a + b, 0) / 5;
+        const avg2 = Object.values(scores2).reduce((a, b) => a + b, 0) / 5;
+
+        document.getElementById('battle1Result').innerHTML = `
+          <div class="battle-score-big">${avg1.toFixed(1)}</div>
+          <div style="text-align: center; color: #888;">/10</div>
+          ${avg1 > avg2 ? '<div style="text-align: center; margin-top: 0.5rem;"><span class="winner-badge">🏆 WINNER</span></div>' :
+            avg1 < avg2 ? '<div style="text-align: center; margin-top: 0.5rem;"><span class="loser-badge">💀 LOSER</span></div>' : ''}
+        `;
+
+        document.getElementById('battle2Result').innerHTML = `
+          <div class="battle-score-big">${avg2.toFixed(1)}</div>
+          <div style="text-align: center; color: #888;">/10</div>
+          ${avg2 > avg1 ? '<div style="text-align: center; margin-top: 0.5rem;"><span class="winner-badge">🏆 WINNER</span></div>' :
+            avg2 < avg1 ? '<div style="text-align: center; margin-top: 0.5rem;"><span class="loser-badge">💀 LOSER</span></div>' : ''}
+        `;
+
+        const winner = avg1 > avg2 ? url1 : avg2 > avg1 ? url2 : 'TIE';
+        document.getElementById('battleWinner').innerHTML = winner === 'TIE'
+          ? `<h3 style="color: #f7c531;">🤝 It's a TIE!</h3><p style="color: #888;">Both sites are equally... interesting.</p>`
+          : `<h3 style="color: #4ade80;">🏆 ${winner} wins!</h3><p style="color: #888;">By ${Math.abs(avg1 - avg2).toFixed(1)} points</p>`;
+
+      } catch (error) {
+        document.getElementById('battleWinner').innerHTML = `<p style="color: #ef4444;">Error: ${error.message}</p>`;
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '⚔️ Start Battle!';
+    }
+
+    // Share Modal
+    function openShareModal() {
+      const avgScore = Object.values(currentScores).reduce((a, b) => a + b, 0) / 5;
+      document.getElementById('shareCardSite').textContent = currentUrl;
+      document.getElementById('shareCardScore').textContent = avgScore.toFixed(1);
+      document.getElementById('shareCardRoast').textContent = `"${currentRoast.substring(0, 150)}..."`;
+      document.getElementById('shareModal').classList.add('active');
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').classList.remove('active');
+    }
+
+    function downloadCard() {
+      // Create canvas and download (simplified version)
+      alert('Screenshot the card above to share! Full download feature coming soon.');
+    }
+
+    function shareToTwitter() {
+      const avgScore = Object.values(currentScores).reduce((a, b) => a + b, 0) / 5;
+      const text = `🔥 ${currentUrl} got ROASTED!\n\nScore: ${avgScore.toFixed(1)}/10\n\n"${currentRoast.substring(0, 100)}..."\n\n#ElevenHacks #RoastMyWebsite`;
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // Copy roast
+    function copyRoast() {
+      navigator.clipboard.writeText(currentRoast);
+      alert('Roast copied to clipboard!');
+    }
+
+    // Roast again
+    function roastAgain() {
+      roastWebsite();
+    }
+
+    // Load voices
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    // Enter key support
+    document.getElementById('urlInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') roastWebsite();
+    });
+  </script>
+</body>
+</html>
